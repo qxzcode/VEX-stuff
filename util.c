@@ -17,6 +17,6 @@ task flywheelTask() {
 		}
 
 		// set the motor value
-		motor[flywheel] = fwMotorVal;
+		motor[flywheel1] = motor[flywheel2] = fwMotorVal;
 	}
 }
