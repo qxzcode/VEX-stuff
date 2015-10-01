@@ -1,3 +1,5 @@
+#pragma config(Sensor, dgtl1,  flywheelEnc1,   sensorQuadEncoder)
+#pragma config(Sensor, dgtl3,  flywheelEnc2,   sensorQuadEncoder)
 #pragma config(Motor,  port1,           driveFL,       tmotorVex393_HBridge, openLoop)
 #pragma config(Motor,  port2,           driveFR,       tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port3,           driveBL,       tmotorVex393_MC29, openLoop)
