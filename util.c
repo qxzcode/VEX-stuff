@@ -1,53 +1,49 @@
+// inputs from user or autonomous control
 bool turnFlywheelOn = false;
-word flywheelSpeed = 80;
-
-struct pidState {
-	float kp, ki, kd;
-	float err, errDeriv, errSum;
-};
-float updatePID(pidState &pid, float error) {
-	pid.errDeriv = error - pid.err;
-	pid.errSum += error;
-	pid.err = error;
-	return pid.kp*pid.err + pid.ki*pid.errSum + pid.kd*pid.errDeriv;
-}
-
-task flywheelTask() {
-	// monitor turnFlywheelOn and control the motor safely
-	word fw1MotorVal = 0, fw2MotorVal = 0;
-	pidState pid1, pid2;
-	pid1.kp = pid2.kp = 1;
-	pid1.ki=pid1.kd=pid2.ki=pid2.kd = 0;
-	while (true) {
-		// target speed for the motor
-		word targetSpd = turnFlywheelOn? flywheelSpeed : 0;
-
-		// if it's greater than current, set it, otherwise "ramp down"
-		if (targetSpd >= fw1MotorVal)
-			fw1MotorVal = targetSpd;
-		else {
-			fw1MotorVal--;
-			wait1Msec(30);
-		}
-
-		// set the motor value
-		motor[flywheel1] = motor[flywheel2] = fw1MotorVal;
+float flywheelSpeed = 1.0 *360/1000; // in degrees of motor rotation per millisecond
 
 
-
-		// PID stuff
-
-		//flywheelPID(flywheel1, flywheelEnc1, targetSpd, fw1MotorVal);
+// subroutine for "ramping down" behavior
+void setFlywheelVal(short motorID, word &currentVal, word targetVal) {
+	// if target is greater than current, set it, otherwise "ramp down"
+	if (targetVal >= currentVal)
+		currentVal = targetVal;
+	else {
+		currentVal--;
 	}
 
-	float targetSpd;
-	const float kP = 1.0f;
+	// set the motor value
+	motor[motorID] = currentVal;
+}
+
+// main task to monitor values and control the flywheel motors
+task flywheelTask() {
+	// these store the current set motor[] values
+	word fw1MotorVal = 0, fw2MotorVal = 0;
+
+	// PID constants
+	const float kP = 1.0;
+
+	// loop
 	while (true) {
-		float fw1Spd = (float)SensorValue[flywheelEnc1] / 50;
+		// control for flywheel motor 1
+		float actualSpd = (float)SensorValue[flywheelEnc1] / 30;
 		SensorValue[flywheelEnc1] = 0;
 
-		float P = kP*(targetSpd-fw1Spd)
+		float err = flywheelSpeed-actualSpd;
+		float P = kP*err;
+		setFlywheelVal(flywheel1, fw1MotorVal, fw1MotorVal+P);
 
-		wait1Msec(50);
+
+		// control for flywheel motor 2
+		actualSpd = (float)SensorValue[flywheelEnc2] / 30;
+		SensorValue[flywheelEnc2] = 0;
+
+		err = flywheelSpeed-actualSpd;
+		P = kP*err;
+		setFlywheelVal(flywheel2, fw2MotorVal, fw2MotorVal+P);
+
+		// wait in between (to "ramp down" and be able to calculate speeds)
+		wait1Msec(30);
 	}
 }
