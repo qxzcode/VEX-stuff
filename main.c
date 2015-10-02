@@ -106,9 +106,9 @@ task usercontrol() {
 			if (vexRT[Btn7D]) turnFlywheelOn = false;
 
 			// press 8D/8U to increment/decrement flywheel speed
-			if (!prev8U && (prev8U=(bool)vexRT[Btn8U])) flywheelSpeed += 7;
-			if (!prev8D && (prev8D=(bool)vexRT[Btn8D])) flywheelSpeed -= 7;
-			if(flywheelSpeed<0)flywheelSpeed=0;if(flywheelSpeed>127)flywheelSpeed=127; // clamp to [0,127]
+			if (!prev8U && (prev8U=(bool)vexRT[Btn8U])) flywheelSpeed += 44*648;
+			if (!prev8D && (prev8D=(bool)vexRT[Btn8D])) flywheelSpeed -= 44*648;
+			//if(flywheelSpeed<0)flywheelSpeed=0;if(flywheelSpeed>127)flywheelSpeed=127; // clamp to [0,127]
 		}
 
 		//UserControlCodePlaceholderForTesting(); // Remove this function call once you have "real" code.

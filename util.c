@@ -1,6 +1,6 @@
 // inputs from user or autonomous control
 bool turnFlywheelOn = false;
-float flywheelSpeed = 1.0 *360/1000; // in degrees of motor rotation per millisecond
+float flywheelSpeed = 800*648 /* *360*60/(1000/30) */; // in encoder ticks per control step
 
 
 // subroutine for "ramping down" behavior
@@ -22,12 +22,12 @@ task flywheelTask() {
 	word fw1MotorVal = 0, fw2MotorVal = 0;
 
 	// PID constants
-	const float kP = 1.0;
+	const float kP = 127.0 / (800*648);
 
 	// loop
 	while (true) {
 		// control for flywheel motor 1
-		float actualSpd = (float)SensorValue[flywheelEnc1] / 30;
+		float actualSpd = (float)SensorValue[flywheelEnc1];
 		SensorValue[flywheelEnc1] = 0;
 
 		float err = flywheelSpeed-actualSpd;
@@ -36,7 +36,7 @@ task flywheelTask() {
 
 
 		// control for flywheel motor 2
-		actualSpd = (float)SensorValue[flywheelEnc2] / 30;
+		actualSpd = (float)SensorValue[flywheelEnc2];
 		SensorValue[flywheelEnc2] = 0;
 
 		err = flywheelSpeed-actualSpd;
