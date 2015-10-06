@@ -1,15 +1,15 @@
 // struct to hold PID state for a motor
 struct pidVals {
 	short motorID, encoderID;
-	word motorVal;
+	short motorVal;
 	float kP, kI, kD;
 	float lastErr, sumErr;
 	float targetVal;
-	word rampDown;
+	short rampDown;
 	bool speed;
 };
 
-void initPID(pidVals &pid, short motorID, short encoderID, float kP, float kI, float kD, bool speed, word rampDown=0, float targetVal=0) {
+void initPID(pidVals &pid, short motorID, short encoderID, float kP, float kI, float kD, bool speed, short rampDown=0, float targetVal=0) {
 	pid.motorID = motorID;
 	pid.encoderID = encoderID;
 	pid.kP = kP;
@@ -35,7 +35,7 @@ void updatePID(pidVals &pid) {
 	float I = pid.kI*pid.sumErr;
 
 	// set motor to calculated output value, ramping down if specified
-	word targetVal = pid.speed? pid.motorVal+P+I+D : P+I+D;
+	short targetVal = pid.speed? pid.motorVal+P+I+D : P+I+D;
 	if (targetVal<pid.motorVal && pid.rampDown>0)
 		pid.motorVal -= pid.rampDown;
 	else
