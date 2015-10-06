@@ -1,5 +1,9 @@
 #pragma config(Sensor, dgtl1,  flywheelEnc1,   sensorQuadEncoder)
 #pragma config(Sensor, dgtl3,  flywheelEnc2,   sensorQuadEncoder)
+#pragma config(Sensor, dgtl5,  encFL,          sensorQuadEncoder)
+#pragma config(Sensor, dgtl7,  encFR,          sensorQuadEncoder)
+#pragma config(Sensor, dgtl9,  encBL,          sensorQuadEncoder)
+#pragma config(Sensor, dgtl11, encBR,          sensorQuadEncoder)
 #pragma config(Motor,  port1,           driveFL,       tmotorVex393_HBridge, openLoop)
 #pragma config(Motor,  port2,           driveFR,       tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port3,           driveBL,       tmotorVex393_MC29, openLoop)
@@ -36,7 +40,7 @@ void pre_auton() {
 
 	// All activities that occur before the competition starts
 	// Example: clearing encoders, setting servo positions, ...
-	startTask(flywheelTask);
+	startTask(motorControlTask);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
