@@ -76,20 +76,20 @@ task usercontrol() {
 	while (true) {
 		//// CONTROL DRIVE WHEELS WITH JOYSTICKS ////
 		{
-			short fl, fr, bl, br;
+			int fl, fr, bl, br;
 
 			// Ch3: forward/backward
-			short ch3 = vexRT[Ch3]; if (abs(ch3)<10) ch3 = 0;
+			word ch3 = vexRT[Ch3]; if (abs(ch3)<10) ch3 = 0;
 			fl = bl = ch3;
 			fr = br = ch3;
 
 			// Ch1: quick turn (rotate)
-			short ch1 = vexRT[Ch1]; if (abs(ch1)<10) ch1 = 0;
+			word ch1 = vexRT[Ch1]; if (abs(ch1)<10) ch1 = 0;
 			fl += ch1; bl += ch1;
 			fr += -ch1; br += -ch1;
 
 			// Ch4: strafe
-			short ch4 = vexRT[Ch4]; if (abs(ch4)<10) ch4 = 0;
+			word ch4 = vexRT[Ch4]; if (abs(ch4)<10) ch4 = 0;
 			fl += ch4; br += ch4;
 			fr += ch4; bl += ch4;
 
