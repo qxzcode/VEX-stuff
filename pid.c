@@ -24,7 +24,7 @@ void initPID(pidVals &pid, tMotor motorID, tSensors encoderID, float kP, float k
 
 void updatePID(pidVals &pid) {
 	// calculate current error
-	float actualVal = (float)SensorValue[pid.encoderID];
+	float actualVal = (float)-SensorValue[pid.encoderID];
 	if (pid.speed) SensorValue[pid.encoderID] = 0;
 	float err = pid.targetVal-actualVal;
 

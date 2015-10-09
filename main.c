@@ -6,10 +6,10 @@
 #pragma config(Sensor, dgtl11, encBR,          sensorQuadEncoder)
 #pragma config(Motor,  port1,           lift1,         tmotorVex393_HBridge, openLoop)
 #pragma config(Motor,  port2,           driveFL,       tmotorVex393_MC29, openLoop)
-#pragma config(Motor,  port3,           driveFR,       tmotorVex393_MC29, openLoop)
-#pragma config(Motor,  port4,           driveBL,       tmotorVex393_MC29, openLoop)
-#pragma config(Motor,  port5,           driveBR,       tmotorVex393_MC29, openLoop)
-#pragma config(Motor,  port6,           intake,        tmotorVex393_MC29, openLoop)
+#pragma config(Motor,  port3,           driveFR,       tmotorVex393_MC29, openLoop, reversed)
+#pragma config(Motor,  port4,           driveBL,       tmotorVex393_MC29, openLoop, reversed)
+#pragma config(Motor,  port5,           driveBR,       tmotorVex393_MC29, openLoop, reversed)
+#pragma config(Motor,  port6,           intake,        tmotorVex393_MC29, openLoop, reversed)
 #pragma config(Motor,  port7,           flywheel1,     tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port8,           flywheel2,     tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port9,           hopper,        tmotorVex393_MC29, openLoop)
@@ -43,7 +43,7 @@ void pre_auton() {
 
 	// All activities that occur before the competition starts
 	// Example: clearing encoders, setting servo positions, ...
-	startTask(motorControlTask);
+//	startTask(motorControlTask);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -73,10 +73,12 @@ task autonomous() {
 /////////////////////////////////////////////////////////////////////////////////////////
 
 task usercontrol() {
+	motorControlInit();//startTask(motorControlTask);
+	wait1Msec(100);
 	bool prev8U = false, prev8D = false; // used for detecting when buttons are pressed (vs held down)
 
 	// main loop
-	while (true) {
+	while (true) {motorControlUpdate();
 		//// CONTROL DRIVE WHEELS WITH JOYSTICKS ////
 		{
 			int fl, fr, bl, br;
@@ -94,27 +96,29 @@ task usercontrol() {
 			// Ch4: strafe
 			word ch4 = vexRT[Ch4]; if (abs(ch4)<10) ch4 = 0;
 			fl += ch4; br += ch4;
-			fr += ch4; bl += ch4;
+			fr -= ch4; bl -= ch4;
 
-			// set target control values
-			flSpd = fl;
-			frSpd = fr;
-			blSpd = bl;
-			brSpd = br;
+			// set target control values (capping to [-127,127])
+			motor[driveFL]= flSpd = fl<-127? -127 : fl>127? 127 : fl;//flSpd = 127;
+		  motor[driveFR]= frSpd = fr<-127? -127 : fr>127? 127 : fr;
+			motor[driveBL]= blSpd = bl<-127? -127 : bl>127? 127 : bl;
+			motor[driveBR]= brSpd = br<-127? -127 : br>127? 127 : br;//flSpd=frSpd=blSpd=brSpd = 127;
 		}
 
 		//// OTHER CONTROLS ////
 		{
 			// hold 6U to turn on intake
 			motor[intake] = vexRT[Btn6U]? 127 : 0;
+			// hold 5U/D to turn on hopper
+			motor[hopper] = vexRT[Btn5U]? 127 : vexRT[Btn5D]? -127 : 0;
 
 			// press 7D/7U to turn flywheel on/off, respectively
 			if (vexRT[Btn7U]) turnFlywheelOn = true;
 			if (vexRT[Btn7D]) turnFlywheelOn = false;
 
 			// press 8D/8U to increment/decrement flywheel speed
-			if (!prev8U && (prev8U=(bool)vexRT[Btn8U])) flywheelSpeed += 44*648;
-			if (!prev8D && (prev8D=(bool)vexRT[Btn8D])) flywheelSpeed -= 44*648;
+			if (!prev8U && (prev8U=(bool)vexRT[Btn8U])) flywheelSpeed += 8;
+			if (!prev8D && (prev8D=(bool)vexRT[Btn8D])) flywheelSpeed -= 8;
 			//if(flywheelSpeed<0)flywheelSpeed=0;if(flywheelSpeed>127)flywheelSpeed=127; // clamp to [0,127]
 		}
 

@@ -2,24 +2,29 @@
 
 // inputs from user or autonomous control
 bool turnFlywheelOn = false;
-float flywheelSpeed = 800*648 /* *360*60/(1000/30) */; // in encoder ticks per control step
+float flywheelSpeed = 144 /* *360*60/(1000/30) */; // in encoder ticks per control step
 
 float flSpd=0, frSpd=0, blSpd=0, brSpd=0;
 
 
+// PID constants for flywheels
+const float kP = 1.0;//127.0 / (800*648);
+const float kD = 0;
+const float kI = 0;
+// PID constants for drive wheels
+const float kPd = 0.5;//127.0 / (800*648);
+const float kDd = 0;
+const float kId = 0.0;
+// constant to convert from joystick input to PID target val
+const float kDrive = 0.2;
+
+pidVals pid1,pid2, pidFL,pidFR,pidBL,pidBR;
+
+
 // main task to control motors with PID
-task motorControlTask() {
-	// PID constants for flywheels
-	const float kP = 127.0 / (800*648);
-	const float kD = 0;
-	const float kI = 0;
-	// PID constants for drive wheels
-	const float kPd = 127.0 / (800*648);
-	const float kDd = 0;
-	const float kId = 0;
+void motorControlInit() {
 
 	// PID states
-	pidVals pid1,pid2, pidFL,pidFR,pidBL,pidBR;
 	initPID(pid1, flywheel1,flywheelEnc1, kP,kI,kD, true, 1);
 	initPID(pid2, flywheel2,flywheelEnc2, kP,kI,kD, true, 1);
 	initPID(pidFL, driveFL,encFL, kPd,kId,kDd, false);
@@ -27,29 +32,34 @@ task motorControlTask() {
 	initPID(pidBL, driveBL,encBL, kPd,kId,kDd, false);
 	initPID(pidBR, driveBR,encBR, kPd,kId,kDd, false);
 
+	SensorValue[encFL] = 0;
+	SensorValue[encFR] = 0;
+	SensorValue[encBL] = 0;
+	SensorValue[encBR] = 0;
+}
+
 	// loop
-	while (true) {
+void motorControlUpdate() {//motor[flywheel1] = 127;return;
 		/// do a PID step all controlled motors motors
-		// flywheels
-		pid1.targetVal = pid2.targetVal = flywheelSpeed;
+		// FLYWHEELS
+		pid1.targetVal = pid2.targetVal = turnFlywheelOn?flywheelSpeed:0;
 		updatePID(pid1);
 		updatePID(pid2);
-		// drive wheels
-		const float kDrive = 1.0;
-		pidFL.targetVal += flSpd*kDrive-SensorValue[encFL];
-		SensorValue[encFL] = 0;
+		// DRIVE WHEELS
+		pidFL.targetVal += flSpd*kDrive;//-SensorValue[encFL];
+		//SensorValue[encFL] = 0;
 		updatePID(pidFL);
-		pidFR.targetVal += frSpd*kDrive-SensorValue[encFR];
-		SensorValue[encFR] = 0;
+		pidFR.targetVal += frSpd*kDrive;//-SensorValue[encFR];
+		//SensorValue[encFR] = 0;
 		updatePID(pidFR);
-		pidBL.targetVal += blSpd*kDrive-SensorValue[encBL];
-		SensorValue[encBL] = 0;
+		pidBL.targetVal += blSpd*kDrive;//-SensorValue[encBL];
+		//SensorValue[encBL] = 0;
 		updatePID(pidBL);
-		pidBR.targetVal += brSpd*kDrive-SensorValue[encBR];
-		SensorValue[encBR] = 0;
+		pidBR.targetVal += brSpd*kDrive;//-SensorValue[encBR];
+		//SensorValue[encBR] = 0;
 		updatePID(pidBR);
 
 		// wait in between (to "ramp down" and be able to calculate speeds)
 		wait1Msec(30);
-	}
+	//}
 }
