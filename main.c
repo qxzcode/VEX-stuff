@@ -57,6 +57,8 @@ task autonomous() {
 	while (true) {
 		IF_PID(motorControlUpdate();)
 		IF_NPID(motor[flywheel1] = motor[flywheel2] = flywheelSpeed;)
+
+		motor[intake] = motor[hopper] = 64;
 	}
 }
 
