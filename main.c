@@ -104,8 +104,8 @@ task usercontrol() {
 
 		//// OTHER CONTROLS ////
 		{
-			// hold 6U to turn on intake
-			motor[intake] = vexRT[Btn6U]? 127 : 0;
+			// hold 6U/D to turn on intake
+			motor[intake] = vexRT[Btn6U]? 127 : vexRT[Btn6D]? -127 : 0;
 			// hold 5U/D to turn on hopper
 			motor[hopper] = vexRT[Btn5U]? 127 : vexRT[Btn5D]? -127 : 0;
 			// hold 7L/R to turn on lift
