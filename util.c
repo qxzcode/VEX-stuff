@@ -2,7 +2,7 @@
 
 // inputs from user or autonomous control
 bool turnFlywheelOn = false;
-float flywheelSpeed = 144 /* *360*60/(1000/30) */; // in encoder ticks per control step
+float flywheelSpeed = 64; // in encoder ticks per control step
 
 float flSpd=0, frSpd=0, blSpd=0, brSpd=0;
 
