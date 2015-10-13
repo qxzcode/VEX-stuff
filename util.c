@@ -13,7 +13,7 @@ const float kD = 0;
 const float kI = 0;
 // PID constants for drive wheels
 const float kPd = 0.5;//127.0 / (800*648);
-const float kDd = 0;
+const float kDd = 0.0;
 const float kId = 0.0;
 // constant to convert from joystick input to PID target val
 const float kDrive = 0.2;
@@ -38,26 +38,27 @@ void motorControlInit() {
 	SensorValue[encBR] = 0;
 }
 
-	// loop
+// loop
+int val[4];
 void motorControlUpdate() {//motor[flywheel1] = 127;return;
 		/// do a PID step all controlled motors motors
 		// FLYWHEELS
 		pid1.targetVal = pid2.targetVal = turnFlywheelOn?flywheelSpeed:0;
-		updatePID(pid1);
-		updatePID(pid2);
+		//updatePID(pid1);
+		//updatePID(pid2);
 		// DRIVE WHEELS
-		pidFL.targetVal += flSpd*kDrive;//-SensorValue[encFL];
-		//SensorValue[encFL] = 0;
+		pidFL.targetVal += flSpd*kDrive-(val[0]=SensorValue[encFL]);
+		SensorValue[encFL] -= val[0];
 		updatePID(pidFL);
-		pidFR.targetVal += frSpd*kDrive;//-SensorValue[encFR];
-		//SensorValue[encFR] = 0;
+		pidFR.targetVal += frSpd*kDrive-(val[1]=SensorValue[encFR]);
+		SensorValue[encFR] -= val[1];
 		updatePID(pidFR);
-		pidBL.targetVal += blSpd*kDrive;//-SensorValue[encBL];
-		//SensorValue[encBL] = 0;
+		pidBL.targetVal += blSpd*kDrive-(val[2]=SensorValue[encBL]);
+		SensorValue[encBL] -= val[2];
 		updatePID(pidBL);
-		pidBR.targetVal += brSpd*kDrive;//-SensorValue[encBR];
-		//SensorValue[encBR] = 0;
-		updatePID(pidBR);
+		pidBR.targetVal += brSpd*kDrive-(val[3]=SensorValue[encBR]);
+		SensorValue[encBR] -= val[3];
+		updatePID(pidBR);//*/
 
 		// wait in between (to "ramp down" and be able to calculate speeds)
 		wait1Msec(30);

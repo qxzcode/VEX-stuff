@@ -28,7 +28,7 @@
 #include "Vex_Competition_Includes.c" //Main competition background code...do not modify!
 
 // CHANGE THIS TO 1/0 TO ENABLE/DISABLE PID CONTROL
-#define USE_PID 0
+#define USE_PID 1
 #if USE_PID
   #define IF_PID(code) code
   #define IF_NPID(code)
@@ -50,6 +50,8 @@ void pre_auton() {
 
 //	Autonomous Task
 task autonomous() {
+	return; // FOR TESTINGGGNNGJDSHFIEUISF
+
 	motorControlInit();
 	flywheelSpeed = 64;
 
