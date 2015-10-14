@@ -12,7 +12,7 @@ const float kP = 1.0;//127.0 / (800*648);
 const float kD = 0;
 const float kI = 0;
 // PID constants for drive wheels
-const float kPd = 0.5;//127.0 / (800*648);
+const float kPd = 0.2;//127.0 / (800*648);
 const float kDd = 0.0;
 const float kId = 0.0;
 // constant to convert from joystick input to PID target val

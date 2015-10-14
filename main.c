@@ -1,3 +1,7 @@
+#pragma config(Sensor, in1,    lineCL,         sensorLineFollower)
+#pragma config(Sensor, in2,    lineCR,         sensorLineFollower)
+#pragma config(Sensor, in3,    lineBL,         sensorLineFollower)
+#pragma config(Sensor, in4,    lineBR,         sensorLineFollower)
 #pragma config(Sensor, dgtl1,  flywheelEnc1,   sensorQuadEncoder)
 #pragma config(Sensor, dgtl3,  flywheelEnc2,   sensorQuadEncoder)
 #pragma config(Sensor, dgtl5,  encFL,          sensorQuadEncoder)
@@ -28,7 +32,7 @@
 #include "Vex_Competition_Includes.c" //Main competition background code...do not modify!
 
 // CHANGE THIS TO 1/0 TO ENABLE/DISABLE PID CONTROL
-#define USE_PID 1
+#define USE_PID 0
 #if USE_PID
   #define IF_PID(code) code
   #define IF_NPID(code)
@@ -81,19 +85,28 @@ task usercontrol() {
 		//// CONTROL DRIVE WHEELS WITH JOYSTICKS ////
 		{
 			int fl, fr, bl, br;
+			bool lineMode = (bool)vexRT[Btn8R];
+#define LINE_THRESHOLD 1000
+			bool lineOnBL = SensorValue[lineBL] > LINE_THRESHOLD;
+			bool lineOnBR = SensorValue[lineBR] > LINE_THRESHOLD;
+			bool lineOnCL = SensorValue[lineCL] > LINE_THRESHOLD;
+			bool lineOnCR = SensorValue[lineCR] > LINE_THRESHOLD;
 
 			// Ch3: forward/backward
-			word ch3 = vexRT[Ch3]; if (abs(ch3)<10) ch3 = 0;
+			word ch3 = vexRT[Ch3];
+			if (abs(ch3)<10) ch3 = 0;
 			fl = bl = ch3;
 			fr = br = ch3;
 
 			// Ch1: quick turn (rotate)
-			word ch1 = vexRT[Ch1]; if (abs(ch1)<10) ch1 = 0;
+			word ch1 = lineMode? (lineOnBL? 127 : lineOnBR? -127 : 0) : vexRT[Ch1];
+			if (abs(ch1)<10) ch1 = 0;
 			fl += ch1; bl += ch1;
-			fr += -ch1; br += -ch1;
+			fr -= ch1; br -= ch1;
 
 			// Ch4: strafe
-			word ch4 = vexRT[Ch4]; if (abs(ch4)<10) ch4 = 0;
+			word ch4 = lineMode? (lineOnCR? 127 : lineOnCL? -127 : 0) : vexRT[Ch4];
+			if (abs(ch4)<10) ch4 = 0;
 			fl += ch4; br += ch4;
 			fr -= ch4; bl -= ch4;
 
