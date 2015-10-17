@@ -27,13 +27,13 @@ void motorControlInit() {
 	// PID states
 	initPID(pid1, flywheel1,flywheelEnc1, kP,kI,kD, true, 1);
 	initPID(pid2, flywheel2,flywheelEnc2, kP,kI,kD, true, 1);
-	initPID(pidFL, driveFL,encFL, kPd,kId,kDd, false);
-	initPID(pidFR, driveFR,encFR, kPd,kId,kDd, false);
+	//initPID(pidFL, driveFL,encFL, kPd,kId,kDd, false);
+	//initPID(pidFR, driveFR,encFR, kPd,kId,kDd, false);
 	initPID(pidBL, driveBL,encBL, kPd,kId,kDd, false);
 	initPID(pidBR, driveBR,encBR, kPd,kId,kDd, false);
 
-	SensorValue[encFL] = 0;
-	SensorValue[encFR] = 0;
+	//SensorValue[encFL] = 0;
+	//SensorValue[encFR] = 0;
 	SensorValue[encBL] = 0;
 	SensorValue[encBR] = 0;
 }
@@ -47,12 +47,12 @@ void motorControlUpdate() {//motor[flywheel1] = 127;return;
 		//updatePID(pid1);
 		//updatePID(pid2);
 		// DRIVE WHEELS
-		pidFL.targetVal += flSpd*kDrive-(val[0]=SensorValue[encFL]);
+		/*pidFL.targetVal += flSpd*kDrive-(val[0]=SensorValue[encFL]);
 		SensorValue[encFL] -= val[0];
 		updatePID(pidFL);
 		pidFR.targetVal += frSpd*kDrive-(val[1]=SensorValue[encFR]);
 		SensorValue[encFR] -= val[1];
-		updatePID(pidFR);
+		updatePID(pidFR);*/
 		pidBL.targetVal += blSpd*kDrive-(val[2]=SensorValue[encBL]);
 		SensorValue[encBL] -= val[2];
 		updatePID(pidBL);

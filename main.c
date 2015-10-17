@@ -4,8 +4,7 @@
 #pragma config(Sensor, in4,    lineBR,         sensorLineFollower)
 #pragma config(Sensor, dgtl1,  flywheelEnc1,   sensorQuadEncoder)
 #pragma config(Sensor, dgtl3,  flywheelEnc2,   sensorQuadEncoder)
-#pragma config(Sensor, dgtl5,  encFL,          sensorQuadEncoder)
-#pragma config(Sensor, dgtl7,  encFR,          sensorQuadEncoder)
+#pragma config(Sensor, dgtl5,  ballSwitch,     sensorTouch)
 #pragma config(Sensor, dgtl9,  encBL,          sensorQuadEncoder)
 #pragma config(Sensor, dgtl11, encBR,          sensorQuadEncoder)
 #pragma config(Motor,  port1,           lift1,         tmotorVex393_HBridge, openLoop)
@@ -51,26 +50,32 @@ void pre_auton() {
 
 
 
+int flyEncVal;
 
 //	Autonomous Task
 task autonomous() {
-	return; // FOR TESTINGGGNNGJDSHFIEUISF
+	//return; // FOR TESTINGGGNNGJDSHFIEUISF
 
-	motorControlInit();
-	flywheelSpeed = 64;
+	motor[flywheel1] = motor[flywheel2] = 80;
 
 	// main loop
 	while (true) {
-		IF_PID(motorControlUpdate();)
-		IF_NPID(motor[flywheel1] = motor[flywheel2] = flywheelSpeed;)
-
-		motor[intake] = motor[hopper] = 64;
+		bool upToSpeed = SensorValue[flywheelEnc2] > 100;
+		flyEncVal = SensorValue[flywheelEnc2];
+		//SensorValue[flywheelEnc2] = 0;
+		upToSpeed = true;
+		if (!SensorValue[ballSwitch] || upToSpeed) {
+			motor[intake] = motor[hopper] = 127;
+		} else {
+			motor[intake] = motor[hopper] = 0;
+		}
+		//wait1Msec(100);
 	}
 }
 
 
 
-
+bool lineOnBL, lineOnBR, lineOnCL, lineOnCR;
 
 //	User Control Task
 task usercontrol() {
@@ -85,12 +90,13 @@ task usercontrol() {
 		//// CONTROL DRIVE WHEELS WITH JOYSTICKS ////
 		{
 			int fl, fr, bl, br;
+#define LINE_THRESHOLD 1700
+#define LINE_F_POWER 64
 			bool lineMode = (bool)vexRT[Btn8R];
-#define LINE_THRESHOLD 500
-			bool lineOnBL = SensorValue[lineBL] < LINE_THRESHOLD;
-			bool lineOnBR = SensorValue[lineBR] < LINE_THRESHOLD;
-			bool lineOnCL = SensorValue[lineCL] < LINE_THRESHOLD && false;
-			bool lineOnCR = SensorValue[lineCR] < LINE_THRESHOLD && false;
+			lineOnBL = SensorValue[lineCL] < LINE_THRESHOLD;
+			lineOnBR = SensorValue[lineCR] < LINE_THRESHOLD;
+			lineOnCL = SensorValue[lineBL] < LINE_THRESHOLD && false;
+			lineOnCR = SensorValue[lineBR] < LINE_THRESHOLD && false;
 
 			// Ch3: forward/backward
 			word ch3 = vexRT[Ch3];
@@ -99,13 +105,13 @@ task usercontrol() {
 			fr = br = ch3;
 
 			// Ch1: quick turn (rotate)
-			word ch1 = lineMode? (lineOnBL? 127 : lineOnBR? -127 : 0) : vexRT[Ch4];
+			word ch1 = lineMode? (lineOnBL? LINE_F_POWER : lineOnBR? -LINE_F_POWER : 0) : vexRT[Ch4];
 			if (abs(ch1)<10) ch1 = 0;
 			fl += ch1; bl += ch1;
 			fr -= ch1; br -= ch1;
 
 			// Ch4: strafe
-			word ch4 = lineMode? (lineOnCR? 127 : lineOnCL? -127 : 0) : vexRT[Ch1];
+			word ch4 = lineMode? (lineOnCR? LINE_F_POWER : lineOnCL? -LINE_F_POWER : 0) : vexRT[Ch1];
 			if (abs(ch4)<10) ch4 = 0;
 			fl += ch4; br += ch4;
 			fr -= ch4; bl -= ch4;
@@ -131,8 +137,8 @@ task usercontrol() {
 			if (vexRT[Btn7D]) turnFlywheelOn = false;
 
 			// press 8D/8U to increment/decrement flywheel speed
-			if (!prev8U && vexRT[Btn8U]) flywheelSpeed += 8;
-			if (!prev8D && vexRT[Btn8D]) flywheelSpeed -= 8;
+			if (!prev8U && vexRT[Btn8U]) flywheelSpeed += 5;
+			if (!prev8D && vexRT[Btn8D]) flywheelSpeed -= 5;
 			prev8U = (bool)vexRT[Btn8U];
 			prev8D = (bool)vexRT[Btn8D];
 			if(flywheelSpeed<0)flywheelSpeed=0;if(flywheelSpeed>127)flywheelSpeed=127; // clamp to [0,127]
