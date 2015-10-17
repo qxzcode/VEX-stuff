@@ -86,11 +86,11 @@ task usercontrol() {
 		{
 			int fl, fr, bl, br;
 			bool lineMode = (bool)vexRT[Btn8R];
-#define LINE_THRESHOLD 1000
-			bool lineOnBL = SensorValue[lineBL] > LINE_THRESHOLD;
-			bool lineOnBR = SensorValue[lineBR] > LINE_THRESHOLD;
-			bool lineOnCL = SensorValue[lineCL] > LINE_THRESHOLD;
-			bool lineOnCR = SensorValue[lineCR] > LINE_THRESHOLD;
+#define LINE_THRESHOLD 500
+			bool lineOnBL = SensorValue[lineBL] < LINE_THRESHOLD;
+			bool lineOnBR = SensorValue[lineBR] < LINE_THRESHOLD;
+			bool lineOnCL = SensorValue[lineCL] < LINE_THRESHOLD && false;
+			bool lineOnCR = SensorValue[lineCR] < LINE_THRESHOLD && false;
 
 			// Ch3: forward/backward
 			word ch3 = vexRT[Ch3];
@@ -99,13 +99,13 @@ task usercontrol() {
 			fr = br = ch3;
 
 			// Ch1: quick turn (rotate)
-			word ch1 = lineMode? (lineOnBL? 127 : lineOnBR? -127 : 0) : vexRT[Ch1];
+			word ch1 = lineMode? (lineOnBL? 127 : lineOnBR? -127 : 0) : vexRT[Ch4];
 			if (abs(ch1)<10) ch1 = 0;
 			fl += ch1; bl += ch1;
 			fr -= ch1; br -= ch1;
 
 			// Ch4: strafe
-			word ch4 = lineMode? (lineOnCR? 127 : lineOnCL? -127 : 0) : vexRT[Ch4];
+			word ch4 = lineMode? (lineOnCR? 127 : lineOnCL? -127 : 0) : vexRT[Ch1];
 			if (abs(ch4)<10) ch4 = 0;
 			fl += ch4; br += ch4;
 			fr -= ch4; bl -= ch4;
